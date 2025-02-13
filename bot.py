@@ -6,7 +6,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 TOKEN = os.environ.get("BOT_TOKEN")
 
 # قائمة معرفات المشرفين
-ADMIN_IDS = [123456789, 987654321]  # غير هذه الأرقام إلى معرفات المشرفين الحقيقية
+ADMIN_IDS = [5222039643]  # غير هذه الأرقام إلى معرفات المشرفين الحقيقية
 
 # قاموس يحتوي على الردود التلقائية
 auto_replies = {
