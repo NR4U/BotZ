@@ -3,10 +3,10 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
 # استخدام المتغير البيئي للتوكن
-TOKEN = os.environ.get("BOT_TOKEN")
+TOKEN = os.environ.get("6789918849:AAFwK5Ck3KUA_i5dHu0R3Ilxn6ER-1x6ih4")
 
 # قائمة معرفات المشرفين
-ADMIN_IDS = [123456789, 987654321]  # غير هذه الأرقام إلى معرفات المشرفين الحقيقية
+ADMIN_IDS = [5222039643]  # غير هذه الأرقام إلى معرفات المشرفين الحقيقية
 
 # قاموس يحتوي على الردود التلقائية
 auto_replies = {
