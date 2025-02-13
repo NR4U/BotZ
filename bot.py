@@ -11,7 +11,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # الحصول على التوكن من متغيرات البيئة
-TOKEN = os.getenv('6789918849:AAFwK5Ck3KUA_i5dHu0R3Ilxn6ER-1x6ih4')
+TOKEN = os.getenv('BOT_TOKEN')
 
 # وظائف البوت
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
