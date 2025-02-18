@@ -1,6 +1,6 @@
 import os
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 # استخدام المتغير البيئي للتوكن
 TOKEN = os.environ.get("BOT_TOKEN")
@@ -15,24 +15,23 @@ auto_replies = {
     "مساء الخير": "مساء النور",
 }
 
-# دالة للتحقق من صلاحيات المشرف
 def is_admin(user_id: int) -> bool:
     return user_id in ADMIN_IDS
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+def start(update: Update, context: CallbackContext):
     if update.message.chat.type == 'private':
         if is_admin(update.message.from_user.id):
-            await update.message.reply_text("مرحباً بك أيها المشرف! أنا بوت الردود التلقائية.")
+            update.message.reply_text("مرحباً بك أيها المشرف! أنا بوت الردود التلقائية.")
         else:
-            await update.message.reply_text("عذراً، هذا البوت يعمل في المجموعات فقط.")
+            update.message.reply_text("عذراً، هذا البوت يعمل في المجموعات فقط.")
     else:
-        await update.message.reply_text("مرحباً! أنا بوت الردود التلقائية.")
+        update.message.reply_text("مرحباً! أنا بوت الردود التلقائية.")
 
-async def add_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+def add_reply(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
     
     if not is_admin(user_id):
-        await update.message.reply_text("عذراً، هذا الأمر متاح للمشرفين فقط.")
+        update.message.reply_text("عذراً، هذا الأمر متاح للمشرفين فقط.")
         return
 
     try:
@@ -42,43 +41,43 @@ async def add_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply = reply.strip()
         
         auto_replies[keyword] = reply
-        await update.message.reply_text(f"تم إضافة الرد بنجاح:\nالكلمة: {keyword}\nالرد: {reply}")
+        update.message.reply_text(f"تم إضافة الرد بنجاح:\nالكلمة: {keyword}\nالرد: {reply}")
     except:
-        await update.message.reply_text("الصيغة غير صحيحة. استخدم: /add الكلمة المفتاحية | الرد")
+        update.message.reply_text("الصيغة غير صحيحة. استخدم: /add الكلمة المفتاحية | الرد")
 
-async def remove_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+def remove_reply(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
     
     if not is_admin(user_id):
-        await update.message.reply_text("عذراً، هذا الأمر متاح للمشرفين فقط.")
+        update.message.reply_text("عذراً، هذا الأمر متاح للمشرفين فقط.")
         return
 
     try:
         keyword = update.message.text.replace("/remove ", "").strip()
         if keyword in auto_replies:
             del auto_replies[keyword]
-            await update.message.reply_text(f"تم حذف الرد للكلمة: {keyword}")
+            update.message.reply_text(f"تم حذف الرد للكلمة: {keyword}")
         else:
-            await update.message.reply_text("الكلمة المفتاحية غير موجودة.")
+            update.message.reply_text("الكلمة المفتاحية غير موجودة.")
     except:
-        await update.message.reply_text("الصيغة غير صحيحة. استخدم: /remove الكلمة المفتاحية")
+        update.message.reply_text("الصيغة غير صحيحة. استخدم: /remove الكلمة المفتاحية")
 
-async def list_replies(update: Update, context: ContextTypes.DEFAULT_TYPE):
+def list_replies(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
     
     if not is_admin(user_id):
-        await update.message.reply_text("عذراً، هذا الأمر متاح للمشرفين فقط.")
+        update.message.reply_text("عذراً، هذا الأمر متاح للمشرفين فقط.")
         return
 
     if auto_replies:
         reply_text = "قائمة الردود التلقائية:\n\n"
         for keyword, reply in auto_replies.items():
             reply_text += f"الكلمة: {keyword}\nالرد: {reply}\n\n"
-        await update.message.reply_text(reply_text)
+        update.message.reply_text(reply_text)
     else:
-        await update.message.reply_text("لا توجد ردود تلقائية مضافة.")
+        update.message.reply_text("لا توجد ردود تلقائية مضافة.")
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+def handle_message(update: Update, context: CallbackContext):
     if update.message.chat.type not in ['group', 'supergroup']:
         return
 
@@ -87,22 +86,26 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         for keyword, reply in auto_replies.items():
             if keyword.lower() in message_text.lower():
-                await update.message.reply_text(reply)
+                update.message.reply_text(reply)
                 break
 
 def main():
-    # Create application
-    app = Application.builder().token(TOKEN).build()
-    
+    # Create updater
+    updater = Updater(TOKEN)
+
+    # Get dispatcher
+    dp = updater.dispatcher
+
     # Add handlers
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("add", add_reply))
-    app.add_handler(CommandHandler("remove", remove_reply))
-    app.add_handler(CommandHandler("list", list_replies))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("add", add_reply))
+    dp.add_handler(CommandHandler("remove", remove_reply))
+    dp.add_handler(CommandHandler("list", list_replies))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+
     # Start bot
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    updater.start_polling()
+    updater.idle()
 
 if __name__ == '__main__':
     main()
