@@ -91,15 +91,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 break
 
 def main():
-    application = Application.builder().token(TOKEN).build()
+    # Create application
+    app = Application.builder().token(TOKEN).build()
     
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("add", add_reply))
-    application.add_handler(CommandHandler("remove", remove_reply))
-    application.add_handler(CommandHandler("list", list_replies))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    # Add handlers
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("add", add_reply))
+    app.add_handler(CommandHandler("remove", remove_reply))
+    app.add_handler(CommandHandler("list", list_replies))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-application.run_polling(allowed_updates=Update.ALL_TYPES)
+    # Start bot
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
     main()
