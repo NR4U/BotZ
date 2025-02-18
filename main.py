@@ -99,7 +99,7 @@ def main():
     application.add_handler(CommandHandler("list", list_replies))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-    application.run_polling()
+application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
     main()
